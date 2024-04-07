@@ -1,7 +1,11 @@
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
+from dotenv import load_dotenv
+import os
 
-API_TOKEN = '6456096274:AAG3-CzzyBpN0OsfaEdgtX8IbCAXB_EVB2k'
+def configure():
+    load_dotenv()
+
 user_name = 'BloomHub_bot'
 
 #comandos
@@ -46,7 +50,8 @@ async def error(update: Update, context: ContextTypes):
 
 if __name__ == '__main__':
     print('Running Chatbot...')
-    app = Application.builder().token(API_TOKEN).build()
+    configure()
+    app = Application.builder().token(os.getenv('API_TOKEN')).build()
 
     app.add_handler(CommandHandler('start',start))
     app.add_handler(CommandHandler('help',help))
