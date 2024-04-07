@@ -1,22 +1,60 @@
-import telebot
+from telegram import Update
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 
-#Conexion con la API de telegram
-TOKEN = '6456096274:AAG3-CzzyBpN0OsfaEdgtX8IbCAXB_EVB2k'
-bot = telebot.TeleBot(TOKEN)
+API_TOKEN = '6456096274:AAG3-CzzyBpN0OsfaEdgtX8IbCAXB_EVB2k'
+user_name = 'BloomHub_bot'
 
-#Creacion de comandos "/start"
-@bot.message_handler(commands=['start'])
-def send_welcome(message):
-    bot.reply_to(message, 'Hola! estas testeando el chatbot para TP')
+#comandos
 
-@bot.message_handler(commands=['start'])
-def send_help(message):
-    bot.reply_to(message, 'Puedes interactuar conmigo usando comandos. Por ahora solo respondo /start y /help')
+async def start(update: Update, context: ContextTypes):
+    await update.message.reply_text("Hola soy un bot. ¿Necesitas Ayuda?")
 
+async def help(update: Update, context: ContextTypes):
+    await update.message.reply_text('Ayuda')
 
-@bot.message_handler(func=lambda m: True)
-def echo_all(message):
-    bot.reply_to(message, message.text)
+async def custom(update: Update, context: ContextTypes):
+    await update.message.reply_text(update.message.text)
 
-if __name__ == "__main__":
-   bot.polling(none_stop=True) 
+def handle_response(text: str,context: ContextTypes,update: Update):
+    proccesed_text = text.lower()
+    print(proccesed_text)
+    if 'hola' in proccesed_text:
+        return 'hola como estas?'
+    elif 'adios' in proccesed_text:
+        return 'bye'
+    else:
+        return 'habla bien ps'
+    
+async def handle_message(update: Update, context: ContextTypes):
+    message_type = update.message.chat.type
+    text = update.message.text
+
+    if message_type == 'group':
+        if text.startswith(user_name):
+            new_text = text.replace(user_name, '')
+            response = handle_response(new_text,context,update)
+        else:
+            return
+    else:
+        response = handle_response(text, context, update)
+
+    await update.message.reply_text(response)
+
+async def error(update: Update, context: ContextTypes):
+    print(context.error)
+    await update.message.reply_text('Ocurrio un error')
+
+if __name__ == '__main__':
+    print('Running Chatbot...')
+    app = Application.builder().token(API_TOKEN).build()
+
+    app.add_handler(CommandHandler('start',start))
+    app.add_handler(CommandHandler('help',help))
+    app.add_handler(CommandHandler('echo',custom))
+
+    app.add_handler(MessageHandler(filters.TEXT, handle_message))
+
+    app.add_error_handler(error)
+
+    print('Chatbot iniciado')
+    app.run_polling(poll_interval=1, timeout=10)
