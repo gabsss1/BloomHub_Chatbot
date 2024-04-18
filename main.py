@@ -8,7 +8,6 @@ def configure():
 
 user_name = 'BloomHub_bot'
 
-# Variable global para controlar si se han mostrado los botones
 buttons_shown = False
 
 def handle_response(text: str, context: ContextTypes, update: Update):
@@ -16,7 +15,6 @@ def handle_response(text: str, context: ContextTypes, update: Update):
     processed_text = text.lower()
     print(processed_text)
     if 'hola' in processed_text:
-        # Mostrar botones solo si no se han mostrado antes
         if not buttons_shown:
             buttons_shown = True
             keyboard = [
@@ -49,7 +47,6 @@ async def handle_message(update: Update, context: ContextTypes):
 
 async def handle_callback_query(update: Update, context: ContextTypes):
     query = update.callback_query
-    # Aquí manejamos la lógica según el callback_data
     if query.data == 'contacto':
         await query.answer('Seleccionaste Contacto')
         await query.message.reply_text('Puedes contactarnos en support@example.com')
